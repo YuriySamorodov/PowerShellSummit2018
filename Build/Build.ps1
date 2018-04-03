@@ -39,7 +39,6 @@ New-PSRoleCapabilityFile @MaintenanceRoleCapabilityCreationParams
 Code "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\RoleCapabilities\PrintOperator.psrc"
 
 # Create the Session Configuration file
-
 $JEAConfigParams = @{
     SessionType = 'RestrictedRemoteServer'
     RunAsVirtualAccount = $true
@@ -55,15 +54,15 @@ Code "$env:ProgramData\JEAConfiguration\PrintOperator.pssc"
 If ((Get-PSSessionConfiguration -name PrintOperator -ErrorAction Silently).exactmatch -eq $true){
     Write-Output -InputObject "Found"
     Unregister-PSSessionConfiguration -Name PrintOperator
-    Restart-service -Name Winrm
+    Restart-service -Name Winrm -Force
 }Else {
     Write-Output -InputObject "Not Found"
 }
 
 If ((Test-Path -path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc") -eq $True){
     Write-Output -InputObject "Found"
-    Register-PSSessionConfiguration -Name PrintOperator
-    Restart-service -Name Winrm
+    Register-PSSessionConfiguration -Name PrintOperator -Path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc"
+    Restart-service -Name Winrm -Force
 }
 
 Get-PSSessionConfiguration 
