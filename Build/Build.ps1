@@ -8,7 +8,7 @@ demonstrations and would need to be modified for your environment.
 #>
 Break # To prevent accidental execution as a script - Do not remove
 
-# Create an OU, User, Group for test
+#region Create an OU, User, Group for test
 
 # Credentials for user passwords
 $credential=(Get-credential).Password
@@ -19,11 +19,9 @@ New-ADUser -Name 'Jim Jea' -SamAccountName JimJea -path 'OU=JEA_Operators,DC=Com
 New-ADGroup -Name 'JEA Print Operators' -Path 'OU=JEA_Operators,DC=Company,DC=Pri' -GroupScope global -GroupCategory Security
 #Add Users to correct groups
 Add-ADGroupMember -Identity 'JEA Print Operators' -Members JimJea
+#endregion
 
-#####################################################################
-
-
-# Create the folders and module/manifest we need.
+#region Create the folders and module/manifest we need.
 # Note - this is being created locally
 If ((Test-Path -path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators") -eq $False) {
     Write-Output "Creating directories"
@@ -36,9 +34,9 @@ If ((Test-Path -path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperat
 
 Explorer "$env:ProgramFiles\WindowsPowerShell\Modules"
 Explorer "$env:ProgramData"
+#endregion
 
-
-# Create the role capability file
+#region Create the role capability file
 $MaintenanceRoleCapabilityCreationParams = @{
     Path = "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\RoleCapabilities\PrintOperator.psrc"
     Author = 'Company Admin'
@@ -52,8 +50,9 @@ $MaintenanceRoleCapabilityCreationParams = @{
 New-PSRoleCapabilityFile @MaintenanceRoleCapabilityCreationParams 
 # Let's take a look at it.
 Code "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\RoleCapabilities\PrintOperator.psrc"
+#endregion
 
-# Create the Session Configuration file
+#region Create the Session Configuration file
 $JEAConfigParams = @{
     SessionType = 'RestrictedRemoteServer'
     RunAsVirtualAccount = $true
@@ -62,9 +61,9 @@ $JEAConfigParams = @{
 New-PSSessionConfigurationFile -Path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc" @JEAConfigParams
 
 Code "$env:ProgramData\JEAConfiguration\PrintOperator.pssc"
+#endregion
 
-
-# Register the endpoint
+#region Register the endpoint
 # NExt -- check if the endpoint already exists -- if it does, you have to remove it
 If ((Get-PSSessionConfiguration -name PrintOperator -ErrorAction Silently).exactmatch -eq $true){
     Write-Output -InputObject "Found"
@@ -81,20 +80,22 @@ If ((Test-Path -path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc") -eq
 }
 
 Get-PSSessionConfiguration 
+#endregion
 
-# Test Access
+#region Test Access
 Enter-PSSession -ComputerName Demo -ConfigurationName PrintOperator -Credential Company\JimJea
 Get-Command
 Get-Command -Module PrintManagement
 Get-Command -Module NetTCPIP
 Ipconfig
+ping 4.2.2.2
 Exit-PSSession
+#endregion
 
-
-
-
-# Cleanup and reset
+#region Cleanup and reset
 Unregister-PSSessionConfiguration -Name PrintOperator
 Restart-service -Name Winrm
 Remove-Item -Path "$env:ProgramData\JEAConfiguration" -Force -Recurse
 Remove-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators" -Force -Recurse
+Get-ADOrganizationalUnit -Filter "Name -eq 'JEA_Operators'" | Remove-ADOrganizationalUnit -Recursive
+#endregion
