@@ -47,9 +47,9 @@ $JEAConfigParams = @{
     RunAsVirtualAccount = $true
     RoleDefinitions = @{'Company\JEA Print Operators' = @{ RoleCapabilities = 'PrintOperator' }}
 }
-New-PSSessionConfigurationFile -Path "$env:ProgramData\JEAConfiguration\JEAPrintOperators.pssc" @JEAConfigParams
+New-PSSessionConfigurationFile -Path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc" @JEAConfigParams
 
-Code "$env:ProgramData\JEAConfiguration\JEAPrintOperators.pssc"
+Code "$env:ProgramData\JEAConfiguration\PrintOperator.pssc"
 
 
 # Register the endpoint
@@ -62,7 +62,7 @@ If ((Get-PSSessionConfiguration -name PrintOperator -ErrorAction Silently).exact
     Write-Output -InputObject "Not Found"
 }
 
-If ((Test-Path -path "$env:ProgramData\JEAConfiguration\JEAPrintOperators.pssc") -eq $True){
+If ((Test-Path -path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc") -eq $True){
     Write-Output -InputObject "Found"
     Register-PSSessionConfiguration -Name PrintOperator
     Restart-service -Name Winrm
@@ -71,7 +71,7 @@ If ((Test-Path -path "$env:ProgramData\JEAConfiguration\JEAPrintOperators.pssc")
 Get-PSSessionConfiguration 
 
 # Test Access
-Enter-PSSession -ComputerName Demo -ConfigurationName PrintOperators -Credential Company\JimJea
+Enter-PSSession -ComputerName Demo -ConfigurationName PrintOperator -Credential Company\JimJea
 Get-Command
 Get-Command -Module PrintManagement
 Get-Command -Module NetTCPIP
