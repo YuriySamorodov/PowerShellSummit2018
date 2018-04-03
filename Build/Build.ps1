@@ -8,15 +8,19 @@ demonstrations and would need to be modified for your environment.
 #>
 Break # To prevent accidental execution as a script - Do not remove
 
-
+# Create the folders and module/manifest we need.
 # Note - this is being created locally
-New-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators" -ItemType Directory
-New-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\RoleCapabilities" -ItemType Directory 
-# You need to create a Module/manifest -- you can put your own functions in the module -- in fact
-New-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\JEAPrintOperators.psm1" -ItemType File
-New-ModuleManifest -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\JEAPrintOperators.psd1"
-#Remove-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators" -Force
+If ((Test-Path -path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators") -eq $False) {
+    Write-Output "Creating directories"
+    New-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators" -ItemType Directory # For module
+    New-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\RoleCapabilities" -ItemType Directory # For role Capability 
+    New-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\JEAPrintOperators.psm1" -ItemType File # Module
+    New-ModuleManifest -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\JEAPrintOperators.psd1" # Manifest
+    New-Item -Path "$env:ProgramData\JEAConfiguration" -ItemType Directory # For Session Configuration
+}
 
+Explorer "$env:ProgramFiles\WindowsPowerShell\Modules"
+Explorer "$env:ProgramData"
 
 
 # Create the role capability file
@@ -35,12 +39,6 @@ New-PSRoleCapabilityFile @MaintenanceRoleCapabilityCreationParams
 Code "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators\RoleCapabilities\PrintOperator.psrc"
 
 # Create the Session Configuration file
-
-# First -- create a folder.
-If ((Test-Path -path "$env:ProgramData\JEAConfiguration") -eq $False) {
-    Write-Output "Creating directory"
-    New-Item -Path "$env:ProgramData\JEAConfiguration" -ItemType Directory
-}
 
 $JEAConfigParams = @{
     SessionType = 'RestrictedRemoteServer'
@@ -80,3 +78,9 @@ Exit-PSSession
 
 
 
+
+# Cleanup and reset
+Unregister-PSSessionConfiguration -Name PrintOperator
+Restart-service -Name Winrm
+Remove-Item -Path "$env:ProgramData\JEAConfiguration" -Force -Recurse
+Remove-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators" -Force -Recurse
