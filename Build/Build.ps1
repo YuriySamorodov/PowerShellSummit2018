@@ -7,28 +7,20 @@ demonstrations and would need to be modified for your environment.
 
 #>
 Break # To prevent accidental execution as a script - Do not remove
+
+# Create an OU, User, Group for test
+
 # Credentials for user passwords
 $credential=(Get-credential).Password
-
 # New OU
 New-ADOrganizationalUnit -Name JEA_Operators -path 'DC=Company,DC=pri' -ProtectedFromAccidentalDeletion $false
-
-# NEw Users
 New-ADUser -Name 'Jim Jea' -SamAccountName JimJea -path 'OU=JEA_Operators,DC=Company,DC=Pri' -AccountPassword $credential -Department Accounting -Enabled $true -PasswordNeverExpires $true 
-New-ADUser -Name 'Jill Jea' -SamAccountName JillJea -path 'OU=JEA_Operators,DC=Company,DC=Pri' -AccountPassword $credential -Department Accounting -Enabled $true -PasswordNeverExpires $true 
-
-#New Group
-# The group name can have spaces, but not underscores.
+#New Group - The group name can have spaces, but not underscores.
 New-ADGroup -Name 'JEA Print Operators' -Path 'OU=JEA_Operators,DC=Company,DC=Pri' -GroupScope global -GroupCategory Security
-New-ADGroup -Name 'JEA Service Operators' -Path 'OU=JEA_Operators,DC=Company,DC=Pri' -GroupScope global -GroupCategory Security
-
 #Add Users to correct groups
 Add-ADGroupMember -Identity 'JEA Print Operators' -Members JimJea
-Add-ADGroupMember -Identity 'JEA Service Operators' -Members JillJea
 
-
-
-
+#####################################################################
 
 
 # Create the folders and module/manifest we need.
