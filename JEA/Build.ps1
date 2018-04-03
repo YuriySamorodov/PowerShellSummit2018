@@ -89,6 +89,7 @@ If ((Test-Path -path "$env:ProgramData\JEAConfiguration\PrintOperator.pssc") -eq
 }
 
 Get-PSSessionConfiguration 
+Get-PSSessionCapability -ConfigurationName PrintOperator -Username JimJea
 #endregion
 
 #region Test Access
