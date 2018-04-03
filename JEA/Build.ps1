@@ -8,8 +8,17 @@ demonstrations and would need to be modified for your environment.
 #>
 Break # To prevent accidental execution as a script - Do not remove
 
-#region Create an OU, User, Group for test
+#region Quick Lession about JEA files
+New-Item -Path c:\test -Force
+New-PSRoleCapabilityFile -Path c:\test\Name.psrc #Role Capability 
+New-PSSessionConfigurationFile -Path c:\test\name.pssc #Session Configuration 
+code C:\test\Name.psrc
+code C:\test\name.pssc
 
+#endregion
+
+#region Create an OU, User, Group for test
+Start-Process -FilePath DSA.MSC
 # Credentials for user passwords
 $credential=(Get-credential).Password
 # New OU
@@ -83,6 +92,7 @@ Get-PSSessionConfiguration
 #endregion
 
 #region Test Access
+#JASON _ DO THIS IN THE SHELL
 Enter-PSSession -ComputerName Demo -ConfigurationName PrintOperator -Credential Company\JimJea
 Get-Command
 Get-Command -Module PrintManagement
@@ -95,6 +105,7 @@ Exit-PSSession
 #region Cleanup and reset
 Unregister-PSSessionConfiguration -Name PrintOperator
 Restart-service -Name Winrm
+Remove-Item -Path c:\test -Force
 Remove-Item -Path "$env:ProgramData\JEAConfiguration" -Force -Recurse
 Remove-Item -Path "$env:ProgramFiles\WindowsPowerShell\Modules\JEAPrintOperators" -Force -Recurse
 Get-ADOrganizationalUnit -Filter "Name -eq 'JEA_Operators'" | Remove-ADOrganizationalUnit -Recursive
